@@ -27,16 +27,6 @@ namespace AlexaShoppingListFunc
             }
         }
 
-        /// <summary>
-        /// A simple function that takes a string and does a ToUpper
-        ///
-        /// To use this handler to respond to an AWS event, reference the appropriate package from 
-        /// https://github.com/aws/aws-lambda-dotnet#events
-        /// and change the string input parameter to the desired event type.
-        /// </summary>
-        /// <param name="input"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
         public static async Task<SkillResponse> FunctionHandlerAsync(SkillRequest input, ILambdaContext context)
         {
             if (input.IsIntentRequest())
@@ -45,15 +35,7 @@ namespace AlexaShoppingListFunc
 
                 if (intentRequest.Intent.Name.Equals("GroceryBoardIntent"))
                 {
-                    //var trelloClient = new TrelloApiClient();
-
                     var item = intentRequest.Intent.Slots["GroceryItem"].Value;
-
-                    
-
-
-
-                    //await trelloClient.CreateCardAsync(item);
 
                     return ResponseBuilder.Tell($"I am adding {item} to grocery board");
                 }
@@ -77,22 +59,6 @@ namespace AlexaShoppingListFunc
             }
 
             return ResponseBuilder.Tell("Skill default response");
-
-            //switch(input.Request)
-            //{
-            //    case LaunchRequest launchRequest:
-            //        LambdaLogger.Log("LaunchRequest");
-            //        return ResponseBuilder.Ask("What would you like to add to your Trello Grocery board?", new Reprompt("What was that?"));
-            //    case IntentRequest intentRequest:
-            //        return ResponseBuilder.Tell(new PlainTextOutputSpeech { Text = "Hello Hello!" });
-
-
-
-            //}
-
-
-            //var response = ResponseBuilder.Tell(new PlainTextOutputSpeech { Text = "Hello Default!" });
-            //return response;
         }
     }
 }
