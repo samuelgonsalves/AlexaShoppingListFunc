@@ -4,9 +4,8 @@ using System.Text;
 
 namespace Trello.Interfaces
 {
-    public interface IResponse
+    public interface IApiResponse<out T>
     {
-        object Body { get; }
-        string ContentType { get; }
+        T Body { get;  }
     }
 }

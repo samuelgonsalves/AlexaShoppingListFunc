@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Trello.Models;
+using Trello.Responses;
 
-namespace Trello.Interfaces
+namespace Trello.Clients.Interfaces
 {
     public interface IBoardsClient
     {

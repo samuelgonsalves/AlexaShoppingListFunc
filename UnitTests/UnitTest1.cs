@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Trello;
+using Trello.Clients;
+using Trello.Responses;
 using Xunit;
 
 namespace UnitTests
@@ -27,22 +29,44 @@ namespace UnitTests
             sentence.CapitalizeFirstLetterOfEachWord().Should().Be("A Sentence With Spaces");
         }
 
-        //[Fact]
-        //public void Test3()
-        //{
-        //    string[] parameters = { "key=123", "name=test", "limit=10" };
-        //    var par = new Dictionary<string, string> { { "key", "123" }, { "name", "test" }, { "limit", "10" } };
+        [Fact(Skip = "Needs to be mocked, makes API call")]
+        public async Task Test3()
+        {
+            var trelloClient = new TrelloApiClient("", "");
 
-        //    QueryStringBuilder.Build(par).Should().Be($"{parameters[0]}&{parameters[1]}&{parameters[2]}");
-        //}
+            var cards = await trelloClient.Boards.GetCardsAsync("");
+        }
 
-        [Fact]
+        [Fact(Skip = "Needs to be mocked, makes API call")]
         public async Task Test4()
         {
-            //var trelloClient = new TrelloApiClient("", "");
+            var trelloClient = new TrelloApiClient("", "");
+            var card = await trelloClient.Cards.CreateCardAsync(new Card { Name = "Chicken Breast", ListId = "" });
+        }
 
-            //var cards = await trelloClient.Boards.GetCardsAsync("");
+        [Fact]
+        public async Task Test5()
+        {
+            var queryString = QueryStringBuilder.BuildQueryParams(new Card { Name = "Chicken Breast's", ListId = "123", Id = "1" });
+            queryString.Should().Be("idList=123&Id=1&name=Chicken%20Breast's");
+        }
 
+
+        [Fact(Skip = "Needs to be mocked, makes API call")]
+        public async Task Test6()
+        {
+            var trelloClient = new TrelloApiClient("", "");
+            var card = await trelloClient.Lists.ArchiveAllCards("");
+
+        }
+
+        [Fact]
+        public async Task Test7()
+        {
+            var queryParams = new Dictionary<string, string> { };
+            queryParams = queryParams.AddParameters(new Dictionary<string, string> { { "apiKey", "SecretsLiveHere" }, { "apiToken", "MyLittleTolkien" } });
+
+            queryParams.Count.Should().NotBe(0);
         }
     }
 }

@@ -7,7 +7,9 @@ namespace Trello.Interfaces
 {
     public interface IApiHandler
     {
-        Task<T> Get<T>(string uri);
+        Task<T> Get<T>(string uri, Dictionary<string, string> queryParams);
+
+        Task<T> Post<T>(string url, Dictionary<string, string> queryParams = null);
 
     }
 }

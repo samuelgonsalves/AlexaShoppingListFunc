@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 
 namespace Trello.Interfaces
 {
-    public interface IResponse
+    public interface IRequest
     {
-        object Body { get; }
-        string ContentType { get; }
+        Uri Uri { get; }
+        HttpMethod Method { get; }
+
     }
 }

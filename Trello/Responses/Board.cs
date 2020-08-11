@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Trello.Models
+namespace Trello.Responses
 {
     public class Board
     {
