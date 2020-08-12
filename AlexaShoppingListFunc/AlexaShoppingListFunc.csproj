@@ -15,5 +15,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SkillLibrary\SkillLibrary.csproj" />
+    <ProjectReference Include="..\Trello\Trello.csproj" />
   </ItemGroup>
 </Project>

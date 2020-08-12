@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Trello.Interfaces;
-//using Trello.QueryStringBuilder;
 
 namespace Trello
 {
@@ -51,7 +50,6 @@ namespace Trello
         }
 
         private Dictionary<string, string> GetAuthenticationParameters() => new Dictionary<string, string> { { "key", _apiKey }, { "token", _apiToken } };
-
 
         private async Task<IApiResponse<T>> PerformRequestAsync<T>(IRequest request)
         {
