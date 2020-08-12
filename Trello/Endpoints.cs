@@ -11,5 +11,6 @@ namespace Trello
         public readonly static string Lists = "/lists";
         public static string BoardCards(string boardId) => $"/boards/{boardId}/cards";
         public static string ListsArchiveAllCards(string listId) => $"/lists/{listId}/archiveAllCards";
+        public static string ListsCards(string listId) => $"/lists/{listId}/cards";
     }
 }

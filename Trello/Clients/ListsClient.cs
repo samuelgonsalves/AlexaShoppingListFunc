@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Trello.Clients.Interfaces;
 using Trello.Interfaces;
 using Trello;
+using Trello.Responses;
 
 namespace Trello.Clients
 {
@@ -15,6 +16,11 @@ namespace Trello.Clients
         public async Task<Responses.List> ArchiveAllCards(string listId)
         {
             return await ApiHandler.Post<Responses.List>(Endpoints.ListsArchiveAllCards(listId));
+        }
+
+        public async Task<IEnumerable<Card>> GetCards(string listId)
+        {
+            return await ApiHandler.Get<IEnumerable<Card>>(Endpoints.ListsCards(listId), null);
         }
     }
 }

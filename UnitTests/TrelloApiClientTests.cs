@@ -47,5 +47,15 @@ namespace UnitTests
             // Act
             var card = await trelloClient.Lists.ArchiveAllCards("");
         }
+
+        [Fact(Skip = "Needs to be mocked, makes API call")]
+        public async Task GetCards_Returns_All_Cards_For_A_List_Test()
+        {
+            // Arrange
+            var trelloClient = new TrelloApiClient("APIKEY", "APITOKEN");
+
+            // Act
+            var card = await trelloClient.Lists.GetCards("");
+        }
     }
 }

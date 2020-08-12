@@ -7,12 +7,15 @@ using Amazon.Lambda.RuntimeSupport;
 using SkillLibrary;
 using System;
 using System.Threading.Tasks;
+using Trello.Clients;
 
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 namespace AlexaShoppingListFunc
 {
     public class Function
     {
+        private static TrelloApiClient _trelloApiClient = new TrelloApiClient(Environment.GetEnvironmentVariable("ApiKey"), 
+                                                                              Environment.GetEnvironmentVariable("ApiToken"));
         /// <summary>
         /// The main entry point for the custom runtime.
         /// </summary>
@@ -33,11 +36,19 @@ namespace AlexaShoppingListFunc
             {
                 var intentRequest = input.Request as IntentRequest;
 
+                // TODO: Figure out how to find list without hardcoding listId
                 if (intentRequest.Intent.Name.Equals("GroceryBoardIntent"))
                 {
                     var item = intentRequest.Intent.Slots["GroceryItem"].Value;
 
+                    await _trelloApiClient.Cards.CreateCardAsync(new Trello.Responses.Card { ListId = "5ed532f0b58ba36765935ff3", Name = item.CapitalizeFirstLetterOfEachWord() });
+
                     return ResponseBuilder.Tell($"I am adding {item} to grocery board");
+                }
+                else if (intentRequest.Intent.Name.Equals("GetGroceryItemsIntent"))
+                {
+                    var cardsOnGroceryList = await _trelloApiClient.Lists.GetCards("5ed532f0b58ba36765935ff3");
+                    return ResponseBuilder.Tell(SkillResponseSentences.GetGroceryItems(cardsOnGroceryList));
                 }
             }
             else if (input.IsLaunchRequest())

@@ -26,6 +26,5 @@ namespace SkillLibrary
 
             return capitalizedWordList.ToString().TrimEnd();
         }
-
     }
 }
