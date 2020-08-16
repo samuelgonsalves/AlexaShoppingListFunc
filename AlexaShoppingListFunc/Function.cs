@@ -6,6 +6,9 @@ using Amazon.Lambda.Core;
 using Amazon.Lambda.RuntimeSupport;
 using SkillLibrary;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Trello.Clients;
 
@@ -37,18 +40,38 @@ namespace AlexaShoppingListFunc
                 var intentRequest = input.Request as IntentRequest;
 
                 // TODO: Figure out how to find list without hardcoding listId
-                if (intentRequest.Intent.Name.Equals("GroceryBoardIntent"))
+                if (intentRequest.Intent.Name.Equals("AddGroceryItemIntent"))
                 {
-                    var item = intentRequest.Intent.Slots["GroceryItem"].Value;
+                    var item = intentRequest.Intent.Slots["GroceryItem"].SlotValue;
 
-                    await _trelloApiClient.Cards.CreateCardAsync(new Trello.Responses.Card { ListId = "5ed532f0b58ba36765935ff3", Name = item.CapitalizeFirstLetterOfEachWord() });
+                    if(item.SlotType == SlotValueType.List)
+                    {
+                        foreach(var v in item.Values)
+                        {
+                            await _trelloApiClient.Cards.CreateCardAsync(new Trello.Responses.Card { ListId = "5ed532f0b58ba36765935ff3", Name = v.Value.CapitalizeFirstLetterOfEachWord() });
+                        }
 
-                    return ResponseBuilder.Tell($"I am adding {item} to grocery board");
+                        return ResponseBuilder.Tell($"I've added {item.Values.Count()} items to your grocery board.");
+                    }
+
+                    await _trelloApiClient.Cards.CreateCardAsync(new Trello.Responses.Card { ListId = "5ed532f0b58ba36765935ff3", Name = item.Value.CapitalizeFirstLetterOfEachWord() });
+
+                    return ResponseBuilder.Tell($"I've added {item} to your grocery board");
                 }
                 else if (intentRequest.Intent.Name.Equals("GetGroceryItemsIntent"))
                 {
                     var cardsOnGroceryList = await _trelloApiClient.Lists.GetCards("5ed532f0b58ba36765935ff3");
                     return ResponseBuilder.Tell(SkillResponseSentences.GetGroceryItems(cardsOnGroceryList));
+                }
+                else if (intentRequest.Intent.Name.Equals("ArchiveAllCardsIntent"))
+                {
+                    // Archive all cards on the Already Have list
+                    // TODO: Figure out how to archive list without hardcoding listId
+                    await _trelloApiClient.Lists.ArchiveAllCards("5ed65088014d693574335aec");
+
+                    var speech = new SsmlOutputSpeech();
+                    speech.Ssml = "<speak><amazon:emotion name=\"excited\" intensity=\"medium\">I've updated your board. Way to go!</amazon:emotion></speak>";
+                    return ResponseBuilder.Tell(speech);
                 }
             }
             else if (input.IsLaunchRequest())
