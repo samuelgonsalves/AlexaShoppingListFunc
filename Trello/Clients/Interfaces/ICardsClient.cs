@@ -8,6 +8,11 @@ namespace Trello.Clients.Interfaces
 {
     public interface ICardsClient
     {
+        /// <summary>
+        /// Creates a card on a list
+        /// </summary>
+        /// <param name="card"></param>
+        /// <returns></returns>
         Task<Card> CreateCardAsync(Card card);
     }
 }
