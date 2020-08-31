@@ -11,5 +11,6 @@ namespace SkillLibrary
         public static bool IsIntentRequest(this SkillRequest skillRequest) => skillRequest.GetRequestType() == typeof(IntentRequest);
         public static bool IsLaunchRequest(this SkillRequest skillRequest) => skillRequest.GetRequestType() == typeof(LaunchRequest);
         public static bool IsSessionEndedRequest(this SkillRequest skillRequest) => skillRequest.GetRequestType() == typeof(SessionEndedRequest);
+        public static bool IsPermissionRequest(this SkillRequest skillRequest) => skillRequest.GetRequestType() == typeof(PermissionSkillEventRequest);
     }
 }
