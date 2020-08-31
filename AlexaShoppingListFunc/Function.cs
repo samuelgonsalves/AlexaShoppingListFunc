@@ -40,13 +40,13 @@ namespace AlexaShoppingListFunc
                 var intentRequest = input.Request as IntentRequest;
 
                 // TODO: Figure out how to find list without hardcoding listId
-                if (intentRequest.Intent.Name.Equals("AddGroceryItemIntent"))
+                if (intentRequest.IsAddGroceries())
                 {
                     var item = intentRequest.Intent.Slots["GroceryItem"].SlotValue;
 
-                    if(item.SlotType == SlotValueType.List)
+                    if (item.SlotType == SlotValueType.List)
                     {
-                        foreach(var v in item.Values)
+                        foreach (var v in item.Values)
                         {
                             await _trelloApiClient.Cards.CreateCardAsync(new Trello.Responses.Card { ListId = "5ed532f0b58ba36765935ff3", Name = v.Value.CapitalizeFirstLetterOfEachWord() });
                         }
@@ -58,40 +58,33 @@ namespace AlexaShoppingListFunc
 
                     return ResponseBuilder.Tell($"I've added {item} to your grocery board");
                 }
-                else if (intentRequest.Intent.Name.Equals("GetGroceryItemsIntent"))
+                else if (intentRequest.IsGetGroceries())
                 {
                     var cardsOnGroceryList = await _trelloApiClient.Lists.GetCards("5ed532f0b58ba36765935ff3");
                     return ResponseBuilder.Tell(SkillResponseSentences.GetGroceryItems(cardsOnGroceryList));
                 }
-                else if (intentRequest.Intent.Name.Equals("ArchiveAllCardsIntent"))
+                else if (intentRequest.IsFinishedShopping())
                 {
                     // Archive all cards on the Already Have list
                     // TODO: Figure out how to archive list without hardcoding listId
                     await _trelloApiClient.Lists.ArchiveAllCards("5ed65088014d693574335aec");
 
-                    var speech = new SsmlOutputSpeech();
-                    speech.Ssml = "<speak><amazon:emotion name=\"excited\" intensity=\"medium\">I've updated your board. Way to go!</amazon:emotion></speak>";
-                    return ResponseBuilder.Tell(speech);
+                    return SkillResponseExtensions.GetFinishedShoppingIntentResponse();
                 }
             }
             else if (input.IsLaunchRequest())
             {
-                return ResponseBuilder.Ask("I can add grocery items to your Trello grocery board", new Reprompt("Come again?"));
+                return SkillResponseExtensions.GetLaunchResponse();
             }
             else if (input.IsSessionEndedRequest())
             {
-                var defaultSkillResponse = new SkillResponse
-                {
-                    Response = new ResponseBody
-                    {
-                        ShouldEndSession = true,
-                        OutputSpeech = new PlainTextOutputSpeech { Text = "Session Ended is called!" }
-                    }
-                };
-
-                return defaultSkillResponse;
+                return SkillResponseExtensions.GetSessionEndedResponse();
             }
+            else if (input.IsPermissionRequest())
+            {
+                var permissionRequest = input.Request as PermissionSkillEventRequest;
 
+            }
             return ResponseBuilder.Tell("Skill default response");
         }
     }
