@@ -11,3 +11,5 @@ A work in progress...
   - Say "Alexa, I'm done shopping"
     - Archives all items off of the grocery list
     - Responds excitedly "Way to go!"
+  - Alexa asks if you want to be reminded to get your groceries.
+    - Sets a reminder to remind you to get your groceries. 
