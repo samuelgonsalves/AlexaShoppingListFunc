@@ -1,6 +1,5 @@
 # AlexaShoppingListFunc
 Alexa skill to manage a Trello grocery list.
-A work in progress...
 
 ## Features
   - Say "Alexa, open grocery board and add Red Baron pepperoni pizza".
