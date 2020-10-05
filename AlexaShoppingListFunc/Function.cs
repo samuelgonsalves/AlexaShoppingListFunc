@@ -1,5 +1,4 @@
 using Alexa.NET;
-using Alexa.NET.Reminders;
 using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
 using Alexa.NET.Response;
@@ -19,6 +18,10 @@ namespace AlexaShoppingListFunc
     {
         private static TrelloApiClient _trelloApiClient = new TrelloApiClient(Environment.GetEnvironmentVariable("ApiKey"),
                                                                               Environment.GetEnvironmentVariable("ApiToken"));
+
+        private static string ToBuyListId => "5ed532f0b58ba36765935ff3";
+        private static string BoughtListId => "5ed65088014d693574335aec";
+
         /// <summary>
         /// The main entry point for the custom runtime.
         /// </summary>
@@ -55,7 +58,7 @@ namespace AlexaShoppingListFunc
                         sess.Attributes = new Dictionary<string, object>();
                         sess.Attributes["reminderRequest"] = true;
 
-                        return ResponseBuilder.Ask("Would you like to be reminded to get your groceries weekly?", new Reprompt("I'm sorry, I didn't catch that. Could you repeat it?"), sess);
+                        return SkillResponseExtensions.GetPermissionsRequestResponse(sess);
                     }
                 }
 
@@ -63,7 +66,6 @@ namespace AlexaShoppingListFunc
                 {
                     var intentRequest = input.Request as IntentRequest;
 
-                    // TODO: Figure out how to find list without hardcoding listId
                     if (intentRequest.IsAddGroceries())
                     {
                         var item = intentRequest.Intent.Slots["GroceryItem"].SlotValue;
@@ -72,26 +74,26 @@ namespace AlexaShoppingListFunc
                         {
                             foreach (var v in item.Values)
                             {
-                                await _trelloApiClient.Cards.CreateCardAsync(new Trello.Responses.Card { ListId = "5ed532f0b58ba36765935ff3", Name = v.Value.CapitalizeFirstLetterOfEachWord() });
+                                await _trelloApiClient.Cards.CreateCardAsync(new Trello.Responses.Card { ListId = ToBuyListId, Name = v.Value.CapitalizeFirstLetterOfEachWord() });
                             }
 
                             return ResponseBuilder.Tell($"I've added {item.Values.Count()} items to your grocery board.");
                         }
 
-                        await _trelloApiClient.Cards.CreateCardAsync(new Trello.Responses.Card { ListId = "5ed532f0b58ba36765935ff3", Name = item.Value.CapitalizeFirstLetterOfEachWord() });
+                        await _trelloApiClient.Cards.CreateCardAsync(new Trello.Responses.Card { ListId = ToBuyListId, Name = item.Value.CapitalizeFirstLetterOfEachWord() });
 
                         return ResponseBuilder.Tell($"I've added {item} to your grocery board");
                     }
                     else if (intentRequest.IsGetGroceries())
                     {
-                        var cardsOnGroceryList = await _trelloApiClient.Lists.GetCards("5ed532f0b58ba36765935ff3");
+                        var cardsOnGroceryList = await _trelloApiClient.Lists.GetCards(ToBuyListId);
                         return ResponseBuilder.Tell(SkillResponseSentences.GetGroceryItems(cardsOnGroceryList));
                     }
                     else if (intentRequest.IsFinishedShopping())
                     {
                         // Archive all cards on the Already Have list
                         // TODO: Figure out how to archive list without hardcoding listId
-                        await _trelloApiClient.Lists.ArchiveAllCards("5ed65088014d693574335aec");
+                        await _trelloApiClient.Lists.ArchiveAllCards(BoughtListId);
 
                         return SkillResponseExtensions.GetFinishedShoppingIntentResponse();
                     }
@@ -102,23 +104,10 @@ namespace AlexaShoppingListFunc
 
                         if (input.Session.Attributes["reminderRequest"].Equals(true))
                         {
-                            var reminder = new Reminder
-                            {
-                                RequestTime = DateTime.UtcNow,
-                                AlertInformation = new AlertInformation(new[] { new SpokenContent("Get your groceries!", "en-GB") }),
-                                Trigger = new AbsoluteTrigger(Convert.ToDateTime(DateTime.Now.AddMinutes(1).ToString("yyyy-MM-ddTHH:mm:ss.fff")),
-                                                              new Recurrence("WEEKLY", new List<string> { "SA" })),
-                                PushNotification = PushNotification.Enabled
-                            };
+                            await RemindersExtensions.SetAWeeklyReminder(input);
 
-                            var response = await RemindersExtensions.CreateReminder(
-                                                        input,
-                                                        reminder
-                                                    );
-
-                            return ResponseBuilder.Tell("I'll remind you to get your grocery every Saturday.");
+                            return SkillResponseExtensions.GetReminderCreatedResponse();
                         }
-
                     }
                 }
                 else if (input.IsLaunchRequest())
